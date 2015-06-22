@@ -19,13 +19,13 @@ class BinaryConstructionTree(object):
     Parameters
     ------------
 
-    data: string, optional
+    data: var, optional
         the value of current node.
 
-    left: string, optional
+    left: BinaryConstructTree, optional
         the left child of the current node.
 
-    right: string, optional
+    right: BinaryConstructTree, optional
         the right child of the current node.
 
     """
@@ -35,10 +35,38 @@ class BinaryConstructionTree(object):
         self.left = left
         self.right = right
 
+    def info(self):
+        """ Return the basic info of the current tree.
 
-    def __str__(self):
-        return str(self.data)
+        return
+        -------
+        data: the value of current node.
 
+        left: the left child of the current node.
+
+        right: the right child of the current node.
+
+        """
+        return self.data, self.left.data, self.right.data
+
+
+    def children(self):
+        """ Return the children of the current node.
+
+        """
+        return self.left, self.right
+
+    def __iter__(self):
+        """ Create an iterator of the tree(from the left child to the right child).
+
+        return
+        -------
+        The tuple combined of the children
+        """
+
+        if not self.left and not self.right:
+            raise StopIteration
+        return self.children().__iter__()
 
     def SP_traverse(self):
         """ Return a string of series-parallel partial order.
@@ -63,7 +91,13 @@ class BinaryConstructionTree(object):
             return str(self.data)
 
 
+"""""""""""""""
+Testing
+"""""""""""""""
 t = BinaryConstructionTree("p", BinaryConstructionTree('s', BinaryConstructionTree(2), BinaryConstructionTree(5)),
                            BinaryConstructionTree(3))
 
-print t.SP_traverse()
+print t.info()
+
+for i in t:
+    print i.data
