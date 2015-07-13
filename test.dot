@@ -1,0 +1,6 @@
+strict digraph  {
+	s1 -> a;
+	s1 -> c;
+	p1 -> s1;
+	p1 -> b;
+}

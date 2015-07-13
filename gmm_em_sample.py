@@ -18,7 +18,7 @@ seed(1)
 mc = [0.5, 0.5]  # Mixing coefficients
 centroids = [array([0, 0]), array([3, 3])]
 ccov = [array([[1, 0.4], [0.4, 1]]), diag((1, 2))]
-print ccov
+# print ccov
 
 # Generate samples from the gaussian mixture model
 X = gmm.sample_gaussian_mixture(centroids, ccov, mc, samples=1000)
