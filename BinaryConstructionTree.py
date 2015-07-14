@@ -34,12 +34,12 @@ class BinaryConstructionTree(object):
 
     """
 
-    def __init__(self, tree=None, name=None, num_extension=0):
+    def __init__(self, tree=None, name=None, num_extension=0, inclusion_probability=0.0):
         # self.data = data
         # self.left = left
         # self.right = right
         self.tree = nx.DiGraph(name)
-        self.num_extension = num_extension
+        self.inclusion_probability = inclusion_probability
 
     def info(self):
         """ Return the basic info of the current tree.
@@ -91,13 +91,13 @@ class BinaryConstructionTree(object):
         # return str(self.data) + " " + str(self.right.SP_traverse())
         #
         # if self.left != None and self.right != None:
-        #     return str(self.left.SP_traverse()) + " " + str(self.data) + " " + str(self.right.SP_traverse())
+        # return str(self.left.SP_traverse()) + " " + str(self.data) + " " + str(self.right.SP_traverse())
         #
         # if self.left == None and self.right == None:
-        #     return str(self.data)
+        # return str(self.data)
 
 
-    def BCT_operators(nodes):
+    def BCT_operators(self):
         """ Return a new non-isomorphic binary construction tree.
 
         The more details of the operation is introduced by "Global partial orders from sequential data."
@@ -107,6 +107,42 @@ class BinaryConstructionTree(object):
         BinaryConstructionTree
 
         """
+        leaves = [node for node, degree in self.tree.out_degree().items() if degree == 0]
+
+        def split(node):
+            # Initialize a list to store split trees.
+            BCT_Tree = []
+
+            # Trivialize the orphaned subtree and re-allocate the position to
+            # the child of the split_node_parent does not be cut.
+            split_node_parent = self.tree.predecessors(node)[0]
+            self.tree.node[node]['position'] = 'trivial'
+            the_other_child = [n for n in self.tree.successors(split_node_parent) if n != node][0]
+            # Shift the child to the position of its parent
+            self.tree.node[the_other_child]['position'] = self.tree.node[split_node_parent]['position']
+            self.tree.node[split_node_parent]['position'] = 'trivial'
+
+            # Cutting the edge which is related to the parent of the split node
+            try:
+                cutting_edges_list = [(n1, n2) for n1, n2 in self.tree.edges() if
+                                      (n1 == split_node_parent or n2 == split_node_parent) and (n2 != node)]
+
+                # Remove edeges
+                for i, j in cutting_edges_list:
+                    self.tree.remove_edge(i, j)
+
+                # Establish the edge on the new movement
+                i, j = [n1 for n1, n2 in cutting_edges_list if n1 == split_node_parent][0], \
+                       [n2 for n1, n2 in cutting_edges_list if n2 == the_other_child][0]
+
+                self.tree.add_edge(i, j)
+            except Exception:
+                raise Exception("in the part of split() suc-function of BCT_operator() function")
+            # print self.tree.edges()
+            return
+
+        node = 'c'
+        split(node)
 
         return
 
@@ -143,18 +179,29 @@ class BinaryConstructionTree(object):
         """
         return [nodes for nodes, positions in self.tree.nodes(data=True) if positions["position"] == position]
 
+    def plot_out(self, title=None, name="Output_png"):
+        try:
+            plt.title(str(title))
+            nx.draw_graphviz(self.tree, prog='dot', with_labels=True, datas=True)
+            plt.savefig(name)
+            plt.show()
+        except Exception:
+            raise Exception("in the part of plot_out() function")
 
-def inclusion_probability(N, s):
+
+def inclusion_probability(M, M_i):
     """ Return a float value of inclusion probability.
 
     pi_i = n / N,
-    where n = |sample i|
-          N = |population|
+    where n = |sample i| = |M_i|
+          N = |population| = |M|
 
     Parameters
     ------------
 
-    N: array of data (typically is string)
+    M: Binary Construction Tree
+
+    M_i: Binary Construction Tree
 
 
     return
@@ -163,6 +210,32 @@ def inclusion_probability(N, s):
 
     """
 
+    n = M_i.tree.number_of_nodes()
+    N = M.tree.number_of_nodes()
+
+    return float(n) / N
+
+
+def probability_of_generating_containing_events(M_i, s):
+    """ Return a float value of inclusion probability.
+
+    f(pv, s) = product_{v in s}(pv) * product_{v not in s}(1 - pv)
+
+    Parameters
+    ------------
+
+    M_i: Binary Construction Tree
+
+    s: String, the incoming sequence
+
+
+    return
+    -------
+    probability_of_generation: float
+
+    """
+
+    # v_in_s =
     return
 
 
@@ -235,7 +308,7 @@ def number_of_extensions(M):
                 n2 = len(M.series_partial_order_representation(right))
 
                 num_extension = (math.factorial(n1 + n2) / (math.factorial(n1) * (math.factorial(n2)))) * (
-                M.tree.node[left]['num_extension']) * (M.tree.node[right]['num_extension'])
+                    M.tree.node[left]['num_extension']) * (M.tree.node[right]['num_extension'])
 
                 M.tree.node[operator]['num_extension'] = num_extension
                 sp_order_formula.append(operator)
@@ -260,6 +333,7 @@ Testing
 # print i.data
 
 G = BinaryConstructionTree()
+G1 = BinaryConstructionTree()
 
 G.tree.add_node("parallel", position="root", num_extension=0)
 G.tree.add_node("a", position="left", num_extension=0)
@@ -272,13 +346,24 @@ G.tree.add_edge("parallel", "b")
 G.tree.add_edge("series", "a")
 G.tree.add_edge("series", "c")
 
+G1.tree.add_edge("parallel", "series")
+G1.tree.add_edge("parallel", "b")
+
 # root = G.get_nodes_from_position("root")[0]
 # sp_list = G.series_partial_order_representation(root)
 # sp_list.reverse()
 # print sp_list
 # sp_list.insert(0, 'm')
 # print sp_list
-print number_of_extensions(G)
+
+# print number_of_extensions(G)
+# G1.inclusion_probability = inclusion_probability(G, G1)
+# print G1.inclusion_probability
+# print G.inclusion_probability
+print G.tree.edges()
+G.BCT_operators()
+print G.tree.edges()
+G.plot_out("BCT_operation_split", "BCT_operation_split")
 
 # print G.series_partial_order_representation()
 
