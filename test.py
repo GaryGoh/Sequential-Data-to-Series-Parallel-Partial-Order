@@ -24,7 +24,19 @@ __author__ = 'GaryGoh'
 
 a = [1,2,3,4,5]
 b = [3,4,5,6,7]
+c = a[:]
+# s = ['a1', 'a2', 'a3', 'b']
+# print [n for n in s if n.__contains__('a')]
 
-print list(set(a).intersection(b))
+c.remove(5)
+print c
+print a
+# print list(set(a).intersection(b))
 
-print
+# print
+
+# s = "series"
+# n = 1
+
+# l = s + str(n)
+# print l

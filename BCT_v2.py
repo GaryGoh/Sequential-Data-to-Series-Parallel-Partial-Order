@@ -11,10 +11,12 @@ G1 = nx.DiGraph()
 # G.add_node("c", position="right")
 
 G.add_node("p1", position="root", numExtention=0)
-G.add_node("a", position="left", numExtention=0)
+G.add_node("p1", position="root", numExtention=0)
+
 G.add_node("s1", position="left", numExtention=0)
 G.add_node("b", position="right", numExtention=0)
 G.add_node("c", position="right", numExtention=0)
+G.add_node("a", position="left", numExtention=0)
 
 # G1.add_node("p1", position="root")
 # G1.add_node("a", position="right")
@@ -34,8 +36,8 @@ G.add_node("c", position="right", numExtention=0)
 
 G.add_edge("p1", "s1")
 G.add_edge("p1", "b")
-G.add_edge("s1", "a")
 G.add_edge("s1", "c")
+G.add_edge("s1", "a")
 
 # G1.add_edge("p1", "s1")
 # G1.add_edge("p1", "b")
@@ -67,23 +69,37 @@ G1.add_edge("s1", "c")
 # print G.nodes(data=True)
 
 
-def get_nodes_from_position(G, position=None):
-    return [nodes for nodes, positions in G.nodes(data=True) if positions["position"] == position]
+# def get_nodes_from_position(G, position=None):
+#     return [nodes for nodes, positions in G.nodes(data=True) if positions["position"] == position]
+
+
 
 
 # leaves = [n for n, d in G.out_degree().items() if d == 0]
 
 # print leaves
-print G.edges()
-l =  [(n1, n2) for n1, n2 in G.edges() if (n1 == 's1' or n2 == 's1') and (n2 != 'c')]
-print l
+# print G.edges()
+# l =  [(n1, n2) for n1, n2 in G.edges() if (n1 == 's1' or n2 == 's1') and (n2 != 'c')]
+# print l
+#
+# a, b =  [n1 for n1, n2 in l if n1 == 'p1'][0], [n2 for n1, n2 in l if n2 == 'a'][0]
+# G.add_edge(a,b)
+# for i, j in l:
+#     G.remove_edge(i, j)
+#
+# print G.edges()
 
-a, b =  [n1 for n1, n2 in l if n1 == 'p1'][0], [n2 for n1, n2 in l if n2 == 'a'][0]
-G.add_edge(a,b)
-for i, j in l:
-    G.remove_edge(i, j)
+# print G.node['c']
+# nx.set_edge_attributes(G, 'c', 'd')
+mapping = {'c':'d'}
+# print G.edges()
 
-print G.edges()
+G = nx.relabel_nodes(G, mapping)
+print G.nodes(data=True)
+print G.node['d']['position']
+
+# print G.edges()
+# print G.node['d']
 
 # print [n for n in G.successors('s1') if n != 'c'][0]
 
@@ -99,18 +115,20 @@ print G.edges()
 # nx.write_dot(G,'test.dot')
 #
 # # same layout using matplotlib with no labels
-plt.title("draw_networkx")
+# plt.title("draw_networkx")
 # pos = nx.graphviz_layout(G1, prog='dot')
-nx.draw_graphviz(G, prog='dot', with_labels=True, datas=True)
+# nx.draw_graphviz(G, prog='dot', with_labels=True, datas=True)
 # nx.draw(G1, pos, with_labels=True, arrows=False)
 # nx.draw(G1,pos,with_labels=True,arrows=False)
 
-plt.savefig('BCT_operation_split.png')
-plt.show()
+# plt.savefig('BCT_operation_split.png')
+# plt.show()
 
 
 
 # print G.nodes()
 # print G.predecessors("a")
 # print nx.is_isomorphic(G, G1)
+# i = len([n for n in G.nodes() if n.__contains__('p')])
+# print i
 
