@@ -29,8 +29,9 @@ c = a[:]
 # print [n for n in s if n.__contains__('a')]
 
 c.remove(5)
-print c
-print a
+# print c
+# print a
+
 # print list(set(a).intersection(b))
 
 # print

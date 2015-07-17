@@ -120,7 +120,11 @@ class BinaryConstructionTree(object):
             # Trivialize the orphaned subtree and re-allocate the position to
             # the child of the split_node_parent does not be cut.
             split_node_parent = M.tree.predecessors(node)[0]
-            split_node_parent_parent = M.tree.predecessors(split_node_parent)[0]
+
+            if M.tree.predecessors(split_node_parent) != []:
+                split_node_parent_parent = M.tree.predecessors(split_node_parent)[0]
+            else:
+                split_node_parent_parent = None
             M.tree.node[node]['position'] = 'trivial'
             the_other_child = [n for n in M.tree.successors(split_node_parent) if n != node][0]
 
@@ -138,8 +142,11 @@ class BinaryConstructionTree(object):
                     M.tree.remove_edge(i, j)
 
                 # Establish the edge on the new movement
-                i, j = [n1 for n1, n2 in cutting_edges_list if n1 == split_node_parent_parent][0], \
-                       [n2 for n1, n2 in cutting_edges_list if n2 == the_other_child][0]
+                if split_node_parent_parent:
+
+                    i, j = [n1 for n1, n2 in cutting_edges_list if n1 == split_node_parent_parent][0], \
+                           [n2 for n1, n2 in cutting_edges_list if n2 == the_other_child][0]
+
 
                 M.tree.add_edge(i, j)
 
@@ -163,35 +170,36 @@ class BinaryConstructionTree(object):
             #       M: BinaryConstructionTree
             ###
 
-            # try:
-            # Relabel the arributes of relevant nodes.
-            mapping = {split_node_parent: operator}
-            M.tree = nx.relabel_nodes(M.tree, mapping)
-            M.tree.node[operator]['position'] = M.tree.node[insert_node]['position']
-            insert_node_parent = M.tree.predecessors(insert_node)[0]
+            try:
+                # Relabel the arributes of relevant nodes.
+                mapping = {split_node_parent: operator}
+                M.tree = nx.relabel_nodes(M.tree, mapping)
+                M.tree.node[operator]['position'] = M.tree.node[insert_node]['position']
+                insert_node_parent = M.tree.predecessors(insert_node)[0]
 
+                # Re-allocate the position to the relevant nodes.
+                if split_node_position == 'right' and split_node_position == M.tree.node[insert_node]['position']:
+                    M.tree.node[insert_node]['position'] = 'left'
 
-            # Re-allocate the position to the relevant nodes.
-            if split_node_position == 'right' and split_node_parent == M.tree.node[insert_node]['position']:
-                M.tree.node[insert_node]['position'] = 'left'
+                elif split_node_position == 'left' and split_node_position == M.tree.node[insert_node]['position']:
+                    M.tree.node[insert_node]['position'] = 'right'
+                M.tree.node[split_node]['position'] = split_node_position
 
-            elif split_node_position == 'left' and split_node_parent == M.tree.node[insert_node]['position']:
-                M.tree.node[insert_node]['position'] = 'right'
-            M.tree.node[split_node]['position'] = split_node_position
+                # print M.tree.edges()
+                # Remove the related edges of the current binary tree
+                M.tree.remove_edge(insert_node_parent, insert_node)
 
-            # print M.tree.edges()
-            # Remove the related edges of the current binary tree
-            M.tree.remove_edge(insert_node_parent, insert_node)
+                # Add the new edges to binary tree
+                M.tree.add_edge(insert_node_parent, operator)
+                M.tree.add_edge(operator, insert_node)
 
-            # Add the new edges to binary tree
-            M.tree.add_edge(insert_node_parent, operator)
-            M.tree.add_edge(operator, insert_node)
-            # except Exception:
-            #     raise Exception('in tha part of insertion() sub-function of BCT_operator() function')
+            except Exception:
+                raise Exception('in tha part of insertion() sub-function of BCT_operator() function')
 
             return M
 
 
+        # To traverse all possible isomorphic binary tree
         for node in leaves_original:
 
             # To preserve meta structure.
@@ -212,10 +220,14 @@ class BinaryConstructionTree(object):
                     operator_id = len([n for n in M.tree.nodes() if n.__contains__(operator)])
                     operator_entity = operator + str(operator_id)
                     for position in ['left', 'right']:
-                        M = insertion(M, insertnode, split_node_parent, split_node, operator_entity, position)
-                        print M.tree.edges()
-                        if not nx.is_isomorphic(self.tree, M.tree):
-                            self.heteromorphism.append(M)
+                        M_split = copy.deepcopy(M)
+                        M_split = insertion(M_split, insertnode, split_node_parent, split_node, operator_entity, position)
+                        import networkx.algorithms.isomorphism as iso
+                        position_category = iso.categorical_edge_match('left', 'right')
+                        
+                        if nx.is_isomorphic(self.tree, M_split.tree, edge_match=position_category):
+                            print split_node, split_node_parent, insertnode, operator_entity, position
+                            self.heteromorphism.append(M_split)
 
 
         # M = copy.deepcopy(self)
@@ -443,7 +455,17 @@ G1.tree.add_edge("parallel", "b")
 # print G.tree.edges()
 G.BCT_operators()
 # print G.heteromorphism
-print G.heteromorphism
+print len(G.heteromorphism)
+for g in G.heteromorphism:
+    # g.plot_out(G.heteromorphism.index(g))
+    print g.tree.edges()
+    print g.tree.nodes(data=True)
+    # print g.series_partial_order_representation()
+    # print number_of_extensions(g)
+# print G.series_partial_order_representation()
+# print G.tree.edges()
+
+# G.heteromorphism[3].plot_out()
 # print
 # print G.tree.edges()
 
