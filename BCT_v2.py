@@ -1,7 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import math
-G = nx.DiGraph()
+G = nx.Graph()
+# G2= nx.Graph()
 G1 = nx.DiGraph()
 
 # G.add_node("p1", position="root")
@@ -38,6 +39,8 @@ G.add_edge("p1", "s1")
 G.add_edge("p1", "b")
 G.add_edge("s1", "c")
 G.add_edge("s1", "a")
+G.add_edge("a", "s1")
+
 
 # G1.add_edge("p1", "s1")
 # G1.add_edge("p1", "b")
@@ -95,8 +98,20 @@ mapping = {'c':'d'}
 # print G.edges()
 
 G = nx.relabel_nodes(G, mapping)
-print G.nodes(data=True)
-print G.node['d']['position']
+# print G.nodes(data=True)
+# print G.node['d']['position']
+
+
+# print G.edges()
+#
+# for i, j in G.edges():
+#     print i, j
+
+
+if not None:
+    print "Yes"
+else:
+    print "No"
 
 # print G.edges()
 # print G.node['d']

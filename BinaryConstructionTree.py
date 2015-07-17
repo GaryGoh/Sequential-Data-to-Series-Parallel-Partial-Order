@@ -147,8 +147,7 @@ class BinaryConstructionTree(object):
                     i, j = [n1 for n1, n2 in cutting_edges_list if n1 == split_node_parent_parent][0], \
                            [n2 for n1, n2 in cutting_edges_list if n2 == the_other_child][0]
 
-
-                M.tree.add_edge(i, j)
+                    M.tree.add_edge(i, j)
 
             except Exception:
                 raise Exception("in the part of split() suc-function of BCT_operator() function")
@@ -193,6 +192,9 @@ class BinaryConstructionTree(object):
                 M.tree.add_edge(insert_node_parent, operator)
                 M.tree.add_edge(operator, insert_node)
 
+                # Eliminate the redundant edge.
+                # for i, j in M.tree.edges():
+
             except Exception:
                 raise Exception('in tha part of insertion() sub-function of BCT_operator() function')
 
@@ -224,9 +226,9 @@ class BinaryConstructionTree(object):
                         M_split = insertion(M_split, insertnode, split_node_parent, split_node, operator_entity, position)
                         import networkx.algorithms.isomorphism as iso
                         position_category = iso.categorical_edge_match('left', 'right')
-                        
+
                         if nx.is_isomorphic(self.tree, M_split.tree, edge_match=position_category):
-                            print split_node, split_node_parent, insertnode, operator_entity, position
+                            # print split_node, split_node_parent, insertnode, operator_entity, position
                             self.heteromorphism.append(M_split)
 
 
