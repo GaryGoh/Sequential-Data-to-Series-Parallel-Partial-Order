@@ -38,7 +38,10 @@ d = [[i,j,k] for i, j , k in c if k ==3]
 a.insert(a.index(3), 6)
 a.insert(a.index(3), 7)
 
-print d[0]
+e = [1]
+
+if len(e) > 0 and e.pop():
+    print "yes"
 
 # c.remove(5)
 # print c

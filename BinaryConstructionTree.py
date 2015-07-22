@@ -254,134 +254,118 @@ class BinaryConstructionTree(object):
         A list of nodes. i.e ['p1', 'a', 'b']
 
         """
-        # try:
-        # Regard sp_order_list as a stack.
-        sp_order_stack = list(nx.dfs_postorder_nodes(self.tree, node))
-        sp_order_stack.reverse()
+        try:
+            # Regard sp_order_list as a stack.
+            sp_order_stack = list(nx.dfs_postorder_nodes(self.tree, node))
+            sp_order_stack.reverse()
 
-        # print sp_order_stack
+            # New a stack to store the lower operation priority element.
+            temp_stack = []
 
-        # New a stack to store the lower operation priority element.
-        temp_stack = []
+            # New a list to store the series-parallel partial order formula
+            sp_order_list = []
 
-        # New a list to store the series-parallel partial order formula
-        sp_order_list = []
+            # New a stack to store the completed operations
+            operations_stack = []
 
-        # New a stack to store the completed operations
-        operations_stack = []
-
-        print sp_order_stack
-        print
-
-        while len(sp_order_stack) >= 2:
-            # ecah round we check whether the root of the first element is match the third element.
-            if len(sp_order_stack) >= 3:
-                the_first_element = sp_order_stack.pop()
-                the_second_element = sp_order_stack.pop()
-                the_third_element = sp_order_stack.pop()
-            else:
-                the_first_element = temp_stack.pop()
-                the_second_element = sp_order_stack.pop()
-                the_third_element = sp_order_stack.pop()
-            print "Current element: {} {} {} {}".format(the_first_element, the_second_element, the_third_element,
-                                                        sp_order_stack)
-
-            if self.tree.predecessors(the_first_element)[0] == the_third_element:
-                # if match then move these three element to sp_order_list
-
-                if not sp_order_list or self.tree.predecessors(sp_order_list[-1])[0] != the_first_element:
-                    sp_order_list.append(the_second_element)
-                    sp_order_list.append(the_first_element)
-                    sp_order_stack.append(the_third_element)
+            while len(sp_order_stack) >= 2:
+                # ecah round we check whether the root of the first element is match the third element.
+                if len(sp_order_stack) >= 3:
+                    the_first_element = sp_order_stack.pop()
+                    the_second_element = sp_order_stack.pop()
+                    the_third_element = sp_order_stack.pop()
                 else:
-                    sp_order_list.append(the_first_element)
-                    sp_order_list.append(the_second_element)
-                    sp_order_stack.append(the_third_element)
+                    the_first_element = temp_stack.pop()
+                    the_second_element = sp_order_stack.pop()
+                    the_third_element = sp_order_stack.pop()
 
-            else:
-                # print self.tree.successors(the_first_element)
-                if self.tree.out_degree(the_first_element) > 0 and self.tree.successors(the_first_element)[
-                    0] in sp_order_list and self.tree.successors(the_first_element)[1] in sp_order_list:
-                    the_first_operation_element = sp_order_list.pop()
-                    the_second_operation_element = sp_order_list.pop()
-                    operations_stack.append(
-                        [the_second_operation_element, the_first_operation_element, the_first_element])
-                    # sp_order_stack.append(the_first_element)
-                    # sp_order_stack.append(the_second_element)
-                    temp_stack.append(the_first_element)
-                    sp_order_stack.append(the_third_element)
-                    sp_order_stack.append(the_second_element)
+                if self.tree.predecessors(the_first_element)[0] == the_third_element:
+                    # if match then move these three element to sp_order_list
+
+                    if not sp_order_list or self.tree.predecessors(sp_order_list[-1])[0] != the_first_element:
+                        sp_order_list.append(the_second_element)
+                        sp_order_list.append(the_first_element)
+                        sp_order_stack.append(the_third_element)
+                    else:
+                        sp_order_list.append(the_first_element)
+                        sp_order_list.append(the_second_element)
+                        sp_order_stack.append(the_third_element)
+
                 else:
-                    if len(temp_stack) <= 0:
-                        # if temp_stack is null then store the first element to temp_stack
-                        # and put the other two back to sp_order_stack.
+                    if self.tree.out_degree(the_first_element) > 0 and self.tree.successors(the_first_element)[
+                        0] in sp_order_list and self.tree.successors(the_first_element)[1] in sp_order_list:
+                        the_first_operation_element = sp_order_list.pop()
+                        the_second_operation_element = sp_order_list.pop()
+                        operations_stack.append(
+                            [the_second_operation_element, the_first_operation_element, the_first_element])
                         temp_stack.append(the_first_element)
                         sp_order_stack.append(the_third_element)
                         sp_order_stack.append(the_second_element)
                     else:
-                        # get a element from temp_stack to check if match
-                        the_temp_element = temp_stack.pop()
-                        the_temp_operation_element = [[i, j, k] for i, j, k in operations_stack if
-                                                      k == the_temp_element]
-
-                        # To check the checked node is already a tree that was search.
-                        if self.tree.predecessors(the_temp_element)[
-                            0] == the_second_element and the_temp_operation_element:
-
-
-
-                            # To check if the node shared the same parent is a tree
-                            # if so, then add its children before it.
-                            # otherwise add itself after the output list.
-                            the_temp_operation_second_element = [[i, j, k] for i, j, k in operations_stack if
-                                                                 k == the_first_element]
-                            if the_temp_operation_second_element:
-                                i, j = the_temp_operation_second_element[0][0], the_temp_operation_second_element[0][1]
-                                sp_order_list.append(i)
-                                sp_order_list.append(j)
-
-                            sp_order_list.append(the_first_element)
-
-                            i, j, k = the_temp_operation_element[0][0], the_temp_operation_element[0][1], \
-                                      the_temp_operation_element[0][2]
-
-                            sp_order_list.append(i)
-                            sp_order_list.append(j)
-                            sp_order_list.append(k)
-
-                            # Recover the sp_order_stack to process next search.
-                            sp_order_stack.append(the_third_element)
-                            sp_order_stack.append(the_second_element)
-
-                        # if the checked node match its parent
-                        elif self.tree.predecessors(the_temp_element)[0] == the_second_element:
-                            sp_order_list.append(the_first_element)
-                            sp_order_list.append(the_temp_element)
-                            sp_order_stack.append(the_third_element)
-                            sp_order_stack.append(the_second_element)
-
-                        # otherwise, put the_temp_element and the_first_element to temp_stack,
-                        #  as they all are not matched the parent searched so far
-                        else:
-                            temp_stack.append(the_temp_element)
+                        if len(temp_stack) <= 0:
+                            # if temp_stack is null then store the first element to temp_stack
+                            # and put the other two back to sp_order_stack.
                             temp_stack.append(the_first_element)
                             sp_order_stack.append(the_third_element)
                             sp_order_stack.append(the_second_element)
+                        else:
+                            # get a element from temp_stack to check if match
+                            the_temp_element = temp_stack.pop()
+                            the_temp_operation_element = [[i, j, k] for i, j, k in operations_stack if
+                                                          k == the_temp_element]
 
-            print "Temp stack: {}".format(temp_stack)
-            print "Operations stack: {}".format(operations_stack)
-
-            print "Output: {}".format(sp_order_list)
-            print
-        sp_root = sp_order_stack.pop()
-        sp_order_list.append(sp_root)
-
-        return sp_order_list
-        # return list(nx.dfs_preorder_nodes(self.tree, node))
+                            # To check the checked node is already a tree that was search.
+                            if self.tree.predecessors(the_temp_element)[
+                                0] == the_second_element and the_temp_operation_element:
 
 
-        # except Exception:
-        # raise TypeError("There is no {} in the binary construction tree".format(node))
+                                # To check if the node shared the same parent is a tree
+                                # if so, then add its children before it.
+                                # otherwise add itself after the output list.
+                                the_temp_operation_second_element = [[i, j, k] for i, j, k in operations_stack if
+                                                                     k == the_first_element]
+                                if the_temp_operation_second_element:
+                                    i, j = the_temp_operation_second_element[0][0], \
+                                           the_temp_operation_second_element[0][1]
+                                    sp_order_list.append(i)
+                                    sp_order_list.append(j)
+
+                                sp_order_list.append(the_first_element)
+
+                                i, j, k = the_temp_operation_element[0][0], the_temp_operation_element[0][1], \
+                                          the_temp_operation_element[0][2]
+
+                                sp_order_list.append(i)
+                                sp_order_list.append(j)
+                                sp_order_list.append(k)
+
+                                # Recover the sp_order_stack to process next search.
+                                sp_order_stack.append(the_third_element)
+                                sp_order_stack.append(the_second_element)
+
+                            # if the checked node match its parent
+                            elif self.tree.predecessors(the_temp_element)[0] == the_second_element:
+                                sp_order_list.append(the_first_element)
+                                sp_order_list.append(the_temp_element)
+                                sp_order_stack.append(the_third_element)
+                                sp_order_stack.append(the_second_element)
+
+                            # otherwise, put the_temp_element and the_first_element to temp_stack,
+                            # as they all are not matched the parent searched so far
+                            else:
+                                temp_stack.append(the_temp_element)
+                                temp_stack.append(the_first_element)
+                                sp_order_stack.append(the_third_element)
+                                sp_order_stack.append(the_second_element)
+
+            sp_root = sp_order_stack.pop()
+            sp_order_list.append(sp_root)
+
+            return sp_order_list
+
+
+        except Exception:
+            raise TypeError("There is no {} in the binary construction tree".format(node))
 
 
     def get_nodes_from_position(self, position=None):
@@ -505,7 +489,9 @@ def number_of_extensions(M):
     root = M.get_nodes_from_position('root')[0]
     sp_order_formula = M.series_partial_order_representation(root)
     sp_order_formula.reverse()
-    print sp_order_formula
+
+    temp_stack = []
+    # print sp_order_formula
 
     while len(sp_order_formula) >= 3:
 
@@ -520,26 +506,45 @@ def number_of_extensions(M):
 
         operator = sp_order_formula.pop()
 
-        try:
-            # Employ the property of series-parallel partial order to calculate the number of extension
-            if operator.__contains__('series'):
-                num_extension = (M.tree.node[left]['num_extension']) * (M.tree.node[right]['num_extension'])
-                M.tree.node[operator]['num_extension'] = num_extension
+        # When series structure
+        if operator.__contains__('series') or operator.__contains__('parallel'):
+            try:
+                # Employ the property of series-parallel partial order to calculate the number of extension
+                if operator.__contains__('series'):
+                    num_extension = (M.tree.node[left]['num_extension']) * (M.tree.node[right]['num_extension'])
+                    M.tree.node[operator]['num_extension'] = num_extension
 
+                    sp_order_formula.append(operator)
+
+                if operator.__contains__('parallel'):
+                    # n1, n2 is the number of events (labels) on a partial order, we need to store the previous result.
+                    n1 = len(M.series_partial_order_representation(left))
+                    n2 = len(M.series_partial_order_representation(right))
+
+                    num_extension = (math.factorial(n1 + n2) / (math.factorial(n1) * (math.factorial(n2)))) * (
+                        M.tree.node[left]['num_extension']) * (M.tree.node[right]['num_extension'])
+
+                    M.tree.node[operator]['num_extension'] = num_extension
+                    sp_order_formula.append(operator)
+            except Exception:
+                raise Exception
+
+        # When parallel structure
+        else:
+            if len(temp_stack) > 0:
+                temp_left = temp_stack.pop()
+
+                # When they share the same parent then push the temp_left to sp_order_formula
+                if M.tree.predecessors(temp_left)[0] == M.tree.predecessors(left)[0]:
+                    sp_order_formula.append(operator)
+                    sp_order_formula.append(right)
+                    sp_order_formula.append(left)
+                    sp_order_formula.append(temp_left)
+            # otherwise, keep pushing the new operator(parent) to temp_stack
+            else:
+                temp_stack.append(left)
                 sp_order_formula.append(operator)
-
-            if operator.__contains__('parallel'):
-                # n1, n2 is the number of events (labels) on a partial order, we need to store the previous result.
-                n1 = len(M.series_partial_order_representation(left))
-                n2 = len(M.series_partial_order_representation(right))
-
-                num_extension = (math.factorial(n1 + n2) / (math.factorial(n1) * (math.factorial(n2)))) * (
-                    M.tree.node[left]['num_extension']) * (M.tree.node[right]['num_extension'])
-
-                M.tree.node[operator]['num_extension'] = num_extension
-                sp_order_formula.append(operator)
-        except Exception:
-            raise Exception
+                sp_order_formula.append(right)
 
     result = sp_order_formula.pop()
 
@@ -650,5 +655,5 @@ G1.tree.add_edge("series2", "j")
 G1.tree.add_edge("series2", "k")
 
 print G1.series_partial_order_representation('parallel')
-# print number_of_extensions(G1)
+# print number_of_extensions(G)
 # G1.plot_out()
