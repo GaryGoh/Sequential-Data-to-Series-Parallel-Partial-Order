@@ -111,11 +111,11 @@ class BinaryConstructionTree(object):
             # Return bin-tuple of the orphaned tree
             #
             # Parameter:
-            #           node: string
+            # node: string
             #
-            #   Return:
-            #           (split_node_parent, node)
-            ###
+            # Return:
+            # (split_node_parent, node)
+            # ##
 
             # Trivialize the orphaned subtree and re-allocate the position to
             # the child of the split_node_parent does not be cut.
@@ -143,7 +143,6 @@ class BinaryConstructionTree(object):
 
                 # Establish the edge on the new movement
                 if split_node_parent_parent:
-
                     i, j = [n1 for n1, n2 in cutting_edges_list if n1 == split_node_parent_parent][0], \
                            [n2 for n1, n2 in cutting_edges_list if n2 == the_other_child][0]
 
@@ -160,14 +159,14 @@ class BinaryConstructionTree(object):
             # Return a new binary construction tree
             #
             # Parameter:
-            #       split_node_parent: string, the old operator
-            #       split_node: string, the cut node, is used to reinsert to the binary construction tree
-            #       operator: string, the new operator, typically two options ("series" and "parallel")
-            #       split_node_position: string, the new position allocated to the cut node.
+            # split_node_parent: string, the old operator
+            # split_node: string, the cut node, is used to reinsert to the binary construction tree
+            # operator: string, the new operator, typically two options ("series" and "parallel")
+            # split_node_position: string, the new position allocated to the cut node.
             #
-            #   Return:
-            #       M: BinaryConstructionTree
-            ###
+            # Return:
+            # M: BinaryConstructionTree
+            # ##
 
             try:
                 # Relabel the arributes of relevant nodes.
@@ -223,8 +222,10 @@ class BinaryConstructionTree(object):
                     operator_entity = operator + str(operator_id)
                     for position in ['left', 'right']:
                         M_split = copy.deepcopy(M)
-                        M_split = insertion(M_split, insertnode, split_node_parent, split_node, operator_entity, position)
+                        M_split = insertion(M_split, insertnode, split_node_parent, split_node, operator_entity,
+                                            position)
                         import networkx.algorithms.isomorphism as iso
+
                         position_category = iso.categorical_edge_match('left', 'right')
 
                         if nx.is_isomorphic(self.tree, M_split.tree, edge_match=position_category):
@@ -253,13 +254,138 @@ class BinaryConstructionTree(object):
         A list of nodes. i.e ['p1', 'a', 'b']
 
         """
-        try:
-            return list(nx.dfs_postorder_nodes(self.tree, node))
-        except Exception:
-            raise TypeError("There is no " + node + " in the binary construction tree")
+        # try:
+        # Regard sp_order_list as a stack.
+        sp_order_stack = list(nx.dfs_postorder_nodes(self.tree, node))
+        sp_order_stack.reverse()
+
+        # print sp_order_stack
+
+        # New a stack to store the lower operation priority element.
+        temp_stack = []
+
+        # New a list to store the series-parallel partial order formula
+        sp_order_list = []
+
+        # New a stack to store the completed operations
+        operations_stack = []
+
+        print sp_order_stack
+        print
+
+        while len(sp_order_stack) >= 2:
+            # ecah round we check whether the root of the first element is match the third element.
+            if len(sp_order_stack) >= 3:
+                the_first_element = sp_order_stack.pop()
+                the_second_element = sp_order_stack.pop()
+                the_third_element = sp_order_stack.pop()
+            else:
+                the_first_element = temp_stack.pop()
+                the_second_element = sp_order_stack.pop()
+                the_third_element = sp_order_stack.pop()
+            print "Current element: {} {} {} {}".format(the_first_element, the_second_element, the_third_element,
+                                                        sp_order_stack)
+
+            if self.tree.predecessors(the_first_element)[0] == the_third_element:
+                # if match then move these three element to sp_order_list
+
+                if not sp_order_list or self.tree.predecessors(sp_order_list[-1])[0] != the_first_element:
+                    sp_order_list.append(the_second_element)
+                    sp_order_list.append(the_first_element)
+                    sp_order_stack.append(the_third_element)
+                else:
+                    sp_order_list.append(the_first_element)
+                    sp_order_list.append(the_second_element)
+                    sp_order_stack.append(the_third_element)
+
+            else:
+                # print self.tree.successors(the_first_element)
+                if self.tree.out_degree(the_first_element) > 0 and self.tree.successors(the_first_element)[
+                    0] in sp_order_list and self.tree.successors(the_first_element)[1] in sp_order_list:
+                    the_first_operation_element = sp_order_list.pop()
+                    the_second_operation_element = sp_order_list.pop()
+                    operations_stack.append(
+                        [the_second_operation_element, the_first_operation_element, the_first_element])
+                    # sp_order_stack.append(the_first_element)
+                    # sp_order_stack.append(the_second_element)
+                    temp_stack.append(the_first_element)
+                    sp_order_stack.append(the_third_element)
+                    sp_order_stack.append(the_second_element)
+                else:
+                    if len(temp_stack) <= 0:
+                        # if temp_stack is null then store the first element to temp_stack
+                        # and put the other two back to sp_order_stack.
+                        temp_stack.append(the_first_element)
+                        sp_order_stack.append(the_third_element)
+                        sp_order_stack.append(the_second_element)
+                    else:
+                        # get a element from temp_stack to check if match
+                        the_temp_element = temp_stack.pop()
+                        the_temp_operation_element = [[i, j, k] for i, j, k in operations_stack if
+                                                      k == the_temp_element]
+
+                        # To check the checked node is already a tree that was search.
+                        if self.tree.predecessors(the_temp_element)[
+                            0] == the_second_element and the_temp_operation_element:
+
+
+
+                            # To check if the node shared the same parent is a tree
+                            # if so, then add its children before it.
+                            # otherwise add itself after the output list.
+                            the_temp_operation_second_element = [[i, j, k] for i, j, k in operations_stack if
+                                                                 k == the_first_element]
+                            if the_temp_operation_second_element:
+                                i, j = the_temp_operation_second_element[0][0], the_temp_operation_second_element[0][1]
+                                sp_order_list.append(i)
+                                sp_order_list.append(j)
+
+                            sp_order_list.append(the_first_element)
+
+                            i, j, k = the_temp_operation_element[0][0], the_temp_operation_element[0][1], \
+                                      the_temp_operation_element[0][2]
+
+                            sp_order_list.append(i)
+                            sp_order_list.append(j)
+                            sp_order_list.append(k)
+
+                            # Recover the sp_order_stack to process next search.
+                            sp_order_stack.append(the_third_element)
+                            sp_order_stack.append(the_second_element)
+
+                        # if the checked node match its parent
+                        elif self.tree.predecessors(the_temp_element)[0] == the_second_element:
+                            sp_order_list.append(the_first_element)
+                            sp_order_list.append(the_temp_element)
+                            sp_order_stack.append(the_third_element)
+                            sp_order_stack.append(the_second_element)
+
+                        # otherwise, put the_temp_element and the_first_element to temp_stack,
+                        #  as they all are not matched the parent searched so far
+                        else:
+                            temp_stack.append(the_temp_element)
+                            temp_stack.append(the_first_element)
+                            sp_order_stack.append(the_third_element)
+                            sp_order_stack.append(the_second_element)
+
+            print "Temp stack: {}".format(temp_stack)
+            print "Operations stack: {}".format(operations_stack)
+
+            print "Output: {}".format(sp_order_list)
+            print
+        sp_root = sp_order_stack.pop()
+        sp_order_list.append(sp_root)
+
+        return sp_order_list
+        # return list(nx.dfs_preorder_nodes(self.tree, node))
+
+
+        # except Exception:
+        # raise TypeError("There is no {} in the binary construction tree".format(node))
 
 
     def get_nodes_from_position(self, position=None):
+
         """ Return a list of nodes of the position.
 
         parameter
@@ -273,7 +399,9 @@ class BinaryConstructionTree(object):
         """
         return [nodes for nodes, positions in self.tree.nodes(data=True) if positions["position"] == position]
 
+
     def plot_out(self, title=None, name="Output_png"):
+
         try:
             plt.title(str(title))
             nx.draw_graphviz(self.tree, prog='dot', with_labels=True, datas=True)
@@ -374,9 +502,11 @@ def number_of_extensions(M):
 
 
     """
-
-    sp_order_formula = M.series_partial_order_representation()
+    root = M.get_nodes_from_position('root')[0]
+    sp_order_formula = M.series_partial_order_representation(root)
     sp_order_formula.reverse()
+    print sp_order_formula
+
     while len(sp_order_formula) >= 3:
 
         # Initialize the number of extension
@@ -392,11 +522,13 @@ def number_of_extensions(M):
 
         try:
             # Employ the property of series-parallel partial order to calculate the number of extension
-            if operator == 'series':
+            if operator.__contains__('series'):
                 num_extension = (M.tree.node[left]['num_extension']) * (M.tree.node[right]['num_extension'])
                 M.tree.node[operator]['num_extension'] = num_extension
+
                 sp_order_formula.append(operator)
-            if operator == 'parallel':
+
+            if operator.__contains__('parallel'):
                 # n1, n2 is the number of events (labels) on a partial order, we need to store the previous result.
                 n1 = len(M.series_partial_order_representation(left))
                 n2 = len(M.series_partial_order_representation(right))
@@ -406,7 +538,6 @@ def number_of_extensions(M):
 
                 M.tree.node[operator]['num_extension'] = num_extension
                 sp_order_formula.append(operator)
-
         except Exception:
             raise Exception
 
@@ -440,8 +571,8 @@ G.tree.add_edge("parallel", "b")
 G.tree.add_edge("series", "a")
 G.tree.add_edge("series", "c")
 
-G1.tree.add_edge("parallel", "series")
-G1.tree.add_edge("parallel", "b")
+# G1.tree.add_edge("parallel", "series")
+# G1.tree.add_edge("parallel", "b")
 
 # root = G.get_nodes_from_position("root")[0]
 # sp_list = G.series_partial_order_representation(root)
@@ -455,17 +586,24 @@ G1.tree.add_edge("parallel", "b")
 # print G1.inclusion_probability
 # print G.inclusion_probability
 # print G.tree.edges()
-G.BCT_operators()
+# G.BCT_operators()
 # print G.heteromorphism
-print len(G.heteromorphism)
-for g in G.heteromorphism:
-    # g.plot_out(G.heteromorphism.index(g))
-    print g.tree.edges()
-    print g.tree.nodes(data=True)
-    # print g.series_partial_order_representation()
-    # print number_of_extensions(g)
+# print len(G.heteromorphism)
+# for g in G.heteromorphism:
+# g.plot_out(G.heteromorphism.index(g))
+# print g.tree.edges()
+# print g.tree.nodes(data=True)
+# print g.tree.nodes()
+# root = g.get_nodes_from_position('root')[0]
+# print root
+
+# print g.series_partial_order_representation(root)
+# print list(nx.dfs_postorder_nodes(g.tree))
+# print number_of_extensions(g)
 # print G.series_partial_order_representation()
 # print G.tree.edges()
+# print G.series_partial_order_representation()
+# print number_of_extensions(G)
 
 # G.heteromorphism[3].plot_out()
 # print
@@ -482,3 +620,35 @@ for g in G.heteromorphism:
 # print H.edges()
 # print root
 # print G.info()
+
+
+G1.tree.add_node("parallel", position="root", num_extension=0)
+G1.tree.add_node("a", position="left", num_extension=0)
+G1.tree.add_node("series", position="right", num_extension=0)
+G1.tree.add_node("parallel1", position="left", num_extension=0)
+G1.tree.add_node("series2", position="right", num_extension=0)
+G1.tree.add_node("series1", position="left", num_extension=0)
+G1.tree.add_node("e", position="right", num_extension=0)
+G1.tree.add_node("parallel2", position="left", num_extension=0)
+G1.tree.add_node("g", position="right", num_extension=0)
+G1.tree.add_node("h", position="left", num_extension=0)
+G1.tree.add_node("i", position="right", num_extension=0)
+G1.tree.add_node("j", position="left", num_extension=0)
+G1.tree.add_node("k", position="right", num_extension=0)
+
+G1.tree.add_edge("parallel", "a")
+G1.tree.add_edge("parallel", "series")
+G1.tree.add_edge("series", "parallel1")
+G1.tree.add_edge("series", "series2")
+G1.tree.add_edge("series1", "parallel2")
+G1.tree.add_edge("series1", "g")
+G1.tree.add_edge("parallel1", "series1")
+G1.tree.add_edge("parallel1", "e")
+G1.tree.add_edge("parallel2", "h")
+G1.tree.add_edge("parallel2", "i")
+G1.tree.add_edge("series2", "j")
+G1.tree.add_edge("series2", "k")
+
+print G1.series_partial_order_representation('parallel')
+# print number_of_extensions(G1)
+# G1.plot_out()

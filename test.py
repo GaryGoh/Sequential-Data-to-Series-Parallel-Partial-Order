@@ -24,13 +24,27 @@ __author__ = 'GaryGoh'
 
 a = [1,2,3,4,5]
 b = [3,4,5,6,7]
-c = a[:]
+c = [[1,2,3], [2,3,4]]
+d = [[i,j,k] for i, j , k in c if k ==3]
+#
+# if d:
+#     print 'yes'
+# else:
+#     print 'no'
+# c = a[:]
 # s = ['a1', 'a2', 'a3', 'b']
 # print [n for n in s if n.__contains__('a')]
 
-c.remove(5)
+a.insert(a.index(3), 6)
+a.insert(a.index(3), 7)
+
+print d[0]
+
+# c.remove(5)
 # print c
 # print a
+
+# print 3 in c[0]
 
 # print list(set(a).intersection(b))
 

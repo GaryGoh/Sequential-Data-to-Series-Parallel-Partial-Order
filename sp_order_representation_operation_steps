@@ -1,0 +1,48 @@
+['parallel', 'series', 'parallel1', 'e', 'series1', 'g', 'parallel2', 'h', 'i', 'series2', 'j', 'k', 'a']
+
+Current element: a k j ['parallel', 'series', 'parallel1', 'e', 'series1', 'g', 'parallel2', 'h', 'i', 'series2']
+Temp stack: ['a']
+Operations stack: []
+Output: []
+
+Current element: k j series2 ['parallel', 'series', 'parallel1', 'e', 'series1', 'g', 'parallel2', 'h', 'i']
+Temp stack: ['a']
+Operations stack: []
+Output: ['j', 'k']
+
+Current element: series2 i h ['parallel', 'series', 'parallel1', 'e', 'series1', 'g', 'parallel2']
+Temp stack: ['a', 'series2']
+Operations stack: [['j', 'k', 'series2']]
+Output: []
+
+Current element: i h parallel2 ['parallel', 'series', 'parallel1', 'e', 'series1', 'g']
+Temp stack: ['a', 'series2']
+Operations stack: [['j', 'k', 'series2']]
+Output: ['h', 'i']
+
+Current element: parallel2 g series1 ['parallel', 'series', 'parallel1', 'e']
+Temp stack: ['a', 'series2']
+Operations stack: [['j', 'k', 'series2']]
+Output: ['h', 'i', 'parallel2', 'g']
+
+Current element: series1 e parallel1 ['parallel', 'series']
+Temp stack: ['a', 'series2']
+Operations stack: [['j', 'k', 'series2']]
+Output: ['h', 'i', 'parallel2', 'g', 'series1', 'e']
+
+Current element: parallel1 series parallel []
+Temp stack: ['a', 'series2', 'parallel1']
+Operations stack: [['j', 'k', 'series2'], ['series1', 'e', 'parallel1']]
+Output: ['h', 'i', 'parallel2', 'g']
+
+Current element: parallel1 series parallel []
+Temp stack: ['a']
+Operations stack: [['j', 'k', 'series2'], ['series1', 'e', 'parallel1']]
+Output: ['h', 'i', 'parallel2', 'g', 'series1', 'e', 'parallel1', 'j', 'k', 'series2']
+
+Current element: a series parallel []
+Temp stack: []
+Operations stack: [['j', 'k', 'series2'], ['series1', 'e', 'parallel1']]
+Output: ['h', 'i', 'parallel2', 'g', 'series1', 'e', 'parallel1', 'j', 'k', 'series2', 'series', 'a']
+
+['h', 'i', 'parallel2', 'g', 'series1', 'e', 'parallel1', 'j', 'k', 'series2', 'series', 'a', 'parallel']
