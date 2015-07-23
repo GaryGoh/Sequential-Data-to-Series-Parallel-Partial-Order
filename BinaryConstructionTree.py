@@ -272,12 +272,10 @@ class BinaryConstructionTree(object):
                 # ecah round we check whether the root of the first element is match the third element.
                 if len(sp_order_stack) >= 3:
                     the_first_element = sp_order_stack.pop()
-                    the_second_element = sp_order_stack.pop()
-                    the_third_element = sp_order_stack.pop()
                 else:
                     the_first_element = temp_stack.pop()
-                    the_second_element = sp_order_stack.pop()
-                    the_third_element = sp_order_stack.pop()
+                the_second_element = sp_order_stack.pop()
+                the_third_element = sp_order_stack.pop()
 
                 if self.tree.predecessors(the_first_element)[0] == the_third_element:
                     # if match then move these three element to sp_order_list
@@ -285,11 +283,10 @@ class BinaryConstructionTree(object):
                     if not sp_order_list or self.tree.predecessors(sp_order_list[-1])[0] != the_first_element:
                         sp_order_list.append(the_second_element)
                         sp_order_list.append(the_first_element)
-                        sp_order_stack.append(the_third_element)
                     else:
                         sp_order_list.append(the_first_element)
                         sp_order_list.append(the_second_element)
-                        sp_order_stack.append(the_third_element)
+                    sp_order_stack.append(the_third_element)
 
                 else:
                     if self.tree.out_degree(the_first_element) > 0 and self.tree.successors(the_first_element)[
@@ -299,15 +296,11 @@ class BinaryConstructionTree(object):
                         operations_stack.append(
                             [the_second_operation_element, the_first_operation_element, the_first_element])
                         temp_stack.append(the_first_element)
-                        sp_order_stack.append(the_third_element)
-                        sp_order_stack.append(the_second_element)
                     else:
                         if len(temp_stack) <= 0:
                             # if temp_stack is null then store the first element to temp_stack
                             # and put the other two back to sp_order_stack.
                             temp_stack.append(the_first_element)
-                            sp_order_stack.append(the_third_element)
-                            sp_order_stack.append(the_second_element)
                         else:
                             # get a element from temp_stack to check if match
                             the_temp_element = temp_stack.pop()
@@ -339,24 +332,20 @@ class BinaryConstructionTree(object):
                                 sp_order_list.append(j)
                                 sp_order_list.append(k)
 
-                                # Recover the sp_order_stack to process next search.
-                                sp_order_stack.append(the_third_element)
-                                sp_order_stack.append(the_second_element)
-
                             # if the checked node match its parent
                             elif self.tree.predecessors(the_temp_element)[0] == the_second_element:
                                 sp_order_list.append(the_first_element)
                                 sp_order_list.append(the_temp_element)
-                                sp_order_stack.append(the_third_element)
-                                sp_order_stack.append(the_second_element)
 
                             # otherwise, put the_temp_element and the_first_element to temp_stack,
                             # as they all are not matched the parent searched so far
                             else:
                                 temp_stack.append(the_temp_element)
                                 temp_stack.append(the_first_element)
-                                sp_order_stack.append(the_third_element)
-                                sp_order_stack.append(the_second_element)
+
+                    # Recover the sp_order_stack to process next search.
+                    sp_order_stack.append(the_third_element)
+                    sp_order_stack.append(the_second_element)
 
             sp_root = sp_order_stack.pop()
             sp_order_list.append(sp_root)
@@ -654,6 +643,6 @@ G1.tree.add_edge("parallel2", "i")
 G1.tree.add_edge("series2", "j")
 G1.tree.add_edge("series2", "k")
 
-print G1.series_partial_order_representation('parallel')
-# print number_of_extensions(G)
+# print G1.series_partial_order_representation('parallel')
+print number_of_extensions(G1)
 # G1.plot_out()
