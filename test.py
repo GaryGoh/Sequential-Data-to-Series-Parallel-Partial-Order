@@ -3,6 +3,7 @@ __author__ = 'GaryGoh'
 # import networkx as nx
 # from networkx.algorithms import bipartite
 # import matplotlib.pyplot as plt
+import math
 #
 #
 # B = nx.Graph()
@@ -10,7 +11,7 @@ __author__ = 'GaryGoh'
 # B.add_nodes_from(['a','b','c'], bipartite=1)
 # B.add_edges_from([(1,'a'), (1,'b'), (2,'b'), (2,'c'), (3,'c'), (4,'a')])
 # for i in B:
-#     print i
+# print i
 #
 #
 # # # same layout using matplotlib with no labels
@@ -22,10 +23,14 @@ __author__ = 'GaryGoh'
 # # plt.savefig('nx_test.png')
 # plt.show()
 
-a = [1,2,3,4,5]
-b = [3,4,5,6,7]
-c = [[1,2,3], [2,3,4]]
-d = [[i,j,k] for i, j , k in c if k ==3]
+a = []
+b = [3, 4, 5, 6, 7]
+c = [[1, 2, 3], [2, 3, 4]]
+d = [[i, j, k] for i, j, k in c if k == 3]
+f = 12
+
+i, j, k = c[0]
+print i, j,k
 #
 # if d:
 #     print 'yes'
@@ -35,13 +40,20 @@ d = [[i,j,k] for i, j , k in c if k ==3]
 # s = ['a1', 'a2', 'a3', 'b']
 # print [n for n in s if n.__contains__('a')]
 
-a.insert(a.index(3), 6)
-a.insert(a.index(3), 7)
+# a.insert(a.index(3), 6)
+# a.insert(a.index(3), 7)
 
 e = [1]
 
-if len(e) > 0 and e.pop():
-    print "yes"
+# a.append(f)
+# a.append(f)
+if a:
+    print "yew"
+else:
+    print 'no'
+
+# if len(e) > 0 and e.pop():
+#     print "yes"
 
 # c.remove(5)
 # print c
@@ -58,3 +70,7 @@ if len(e) > 0 and e.pop():
 
 # l = s + str(n)
 # print l
+
+# a = math.factorial(10)/(math.factorial(7) * math.factorial(3)) * 12
+#
+# print a * 12
