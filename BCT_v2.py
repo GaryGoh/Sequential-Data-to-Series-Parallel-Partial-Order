@@ -212,7 +212,8 @@ print G1.out_degree('a')
 # plt.savefig('BCT_operation_split.png')
 # plt.show()
 
-
+left, right = G.successors('p1')
+print left, right, G.successors('p1')
 
 # print G.nodes()
 # print G.predecessors("a")

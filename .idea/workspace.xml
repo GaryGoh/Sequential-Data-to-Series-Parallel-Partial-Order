@@ -14,13 +14,13 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/tttt$t2.coverage" NAME="t2 Coverage Results" MODIFIED="1434538859532" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Sequential data to series-parallel paritial order$t.coverage" NAME="t Coverage Results" MODIFIED="1436015037544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Sequential data to series-parallel paritial order$BCT_v2.coverage" NAME="BCT_v2 Coverage Results" MODIFIED="1437430784663" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Sequential data to series-parallel paritial order$BCT_v2.coverage" NAME="BCT_v2 Coverage Results" MODIFIED="1437821632808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Sequential data to series-parallel paritial order$ttt.coverage" NAME="ttt Coverage Results" MODIFIED="1436315321672" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Sequential data to series-parallel paritial order$test.coverage" NAME="test Coverage Results" MODIFIED="1437743795101" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Sequential data to series-parallel paritial order$gmm_em_sample.coverage" NAME="gmm_em_sample Coverage Results" MODIFIED="1436433457572" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/tttt$t.coverage" NAME="t Coverage Results" MODIFIED="1434536541939" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/tttt$BCT.coverage" NAME="BCT Coverage Results" MODIFIED="1434715822273" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Sequential data to series-parallel paritial order$BinaryConstructionTree.coverage" NAME="BinaryConstructionTree Coverage Results" MODIFIED="1437752965937" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Sequential data to series-parallel paritial order$BinaryConstructionTree.coverage" NAME="BinaryConstructionTree Coverage Results" MODIFIED="1437822378276" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/tttt$.coverage" NAME="同 Coverage Results" MODIFIED="1434537249131" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Sequential data to series-parallel paritial order$tt.coverage" NAME="tt Coverage Results" MODIFIED="1436366505250" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
@@ -39,8 +39,8 @@
       <file leaf-file-name="BCT_v2.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BCT_v2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2912" max-vertical-offset="3420">
-              <caret line="174" column="22" selection-start-line="174" selection-start-column="22" selection-end-line="174" selection-end-column="22" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2912" max-vertical-offset="3435">
+              <caret line="215" column="19" selection-start-line="215" selection-start-column="19" selection-end-line="215" selection-end-column="19" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -68,8 +68,8 @@
       <file leaf-file-name="BinaryConstructionTree.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/BinaryConstructionTree.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4792531" vertical-offset="5364" max-vertical-offset="10785">
-              <caret line="373" column="76" selection-start-line="373" selection-start-column="76" selection-end-line="373" selection-end-column="76" />
+            <state vertical-scroll-proportion="5.419087" vertical-offset="8938" max-vertical-offset="11655">
+              <caret line="770" column="29" selection-start-line="770" selection-start-column="29" selection-end-line="770" selection-end-column="29" />
               <folding>
                 <element signature="e#24#45#0" expanded="true" />
               </folding>
@@ -148,9 +148,9 @@
         <option value="$PROJECT_DIR$/ttt.py" />
         <option value="$PROJECT_DIR$/tt.py" />
         <option value="$PROJECT_DIR$/gmm_em_sample.py" />
-        <option value="$PROJECT_DIR$/BCT_v2.py" />
         <option value="$PROJECT_DIR$/sp_order_representation_operation_steps" />
         <option value="$PROJECT_DIR$/test.py" />
+        <option value="$PROJECT_DIR$/BCT_v2.py" />
         <option value="$PROJECT_DIR$/BinaryConstructionTree.py" />
       </list>
     </option>
@@ -491,8 +491,8 @@
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Python.BinaryConstructionTree" />
-        <item index="1" class="java.lang.String" itemvalue="Python.test" />
-        <item index="2" class="java.lang.String" itemvalue="Python.BCT_v2" />
+        <item index="1" class="java.lang.String" itemvalue="Python.BCT_v2" />
+        <item index="2" class="java.lang.String" itemvalue="Python.test" />
         <item index="3" class="java.lang.String" itemvalue="Python.gmm_em_sample" />
         <item index="4" class="java.lang.String" itemvalue="Python.tt" />
       </list>
@@ -877,16 +877,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/BCT_v2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2252" max-vertical-offset="3420">
-          <caret line="174" column="22" selection-start-line="174" selection-start-column="22" selection-end-line="174" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test.dot">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="777">
@@ -930,10 +920,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/BCT_v2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2912" max-vertical-offset="3435">
+          <caret line="215" column="19" selection-start-line="215" selection-start-column="19" selection-end-line="215" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/BinaryConstructionTree.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4792531" vertical-offset="5364" max-vertical-offset="10785">
-          <caret line="373" column="76" selection-start-line="373" selection-start-column="76" selection-end-line="373" selection-end-column="76" />
+        <state vertical-scroll-proportion="5.419087" vertical-offset="8938" max-vertical-offset="11655">
+          <caret line="770" column="29" selection-start-line="770" selection-start-column="29" selection-end-line="770" selection-end-column="29" />
           <folding>
             <element signature="e#24#45#0" expanded="true" />
           </folding>
