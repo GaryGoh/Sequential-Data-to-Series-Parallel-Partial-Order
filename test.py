@@ -23,17 +23,30 @@ import math
 # # plt.savefig('nx_test.png')
 # plt.show()
 
-a = []
+a = [2, 3, 8]
+a1 = [2, 8]
+
+# print a in a1
 b = [3, 4, 5, 6, 7]
 c = [[1, 2, 3], [2, 3, 4]]
 d = [[i, j, k] for i, j, k in c if k == 3]
 f = 12
 
 i, j, k = c[0]
-print i, j,k
+a2 = "abc'"
+
+# i = a.index(a[0])
+# j = a.index(a[-1])
+# print a[i:]
+
+
+
+a.append([11,12])
+print a
+# print i, j,k
 #
 # if d:
-#     print 'yes'
+# print 'yes'
 # else:
 #     print 'no'
 # c = a[:]
@@ -62,6 +75,7 @@ else:
 # print 3 in c[0]
 
 # print list(set(a).intersection(b))
+# print list(set(a).difference(b))
 
 # print
 

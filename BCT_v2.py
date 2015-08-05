@@ -3,26 +3,40 @@ import matplotlib.pyplot as plt
 import math
 
 G = nx.DiGraph()
-# G2= nx.Graph()
+G2 = nx.DiGraph()
+G3 = nx.DiGraph()
+
 G1 = nx.DiGraph()
 
-# G.add_node("p1", position="root")
-# G.add_node("a", position="left")
-# G.add_node("s1", position="left")
-# G.add_node("b", position="right")
-# G.add_node("c", position="right")
+G.add_node("p1", position="root")
+G.add_node("s1", position="left")
+G.add_node("c", position="right")
+G.add_node("a", position="left")
+G.add_node("b", position="right")
 
-G.add_node("p1", position="root", numExtention=0)
-G.add_node("s1", position="left", numExtention=0)
-G.add_node("b", position="right", numExtention=0)
-G.add_node("c", position="right", numExtention=0)
-G.add_node("a", position="left", numExtention=0)
-G.add_node("e", position="right", numExtention=0)
-G.add_node("d", position="left", numExtention=0)
-G.add_node("f", position="right", numExtention=0)
-G.add_node("g", position="left", numExtention=0)
-G.add_node("h", position="right", numExtention=0)
-G.add_node("i", position="left", numExtention=0)
+G2.add_node("p", position="root")
+G2.add_node("s1", position="left")
+G2.add_node("c", position="right")
+G2.add_node("a", position="left")
+G2.add_node("b", position="right")
+
+G3.add_node("p1", position="root")
+G3.add_node("p2", position="left")
+G3.add_node("b", position="right")
+G3.add_node("a", position="left")
+G3.add_node("c", position="right")
+
+# G.add_node("p1", position="root", numExtention=0)
+# G.add_node("s1", position="left", numExtention=0)
+# G.add_node("b", position="right", numExtention=0)
+# G.add_node("c", position="right", numExtention=0)
+# G.add_node("a", position="left", numExtention=0)
+# G.add_node("e", position="right", numExtention=0)
+# G.add_node("d", position="left", numExtention=0)
+# G.add_node("f", position="right", numExtention=0)
+# G.add_node("g", position="left", numExtention=0)
+# G.add_node("h", position="right", numExtention=0)
+# G.add_node("i", position="left", numExtention=0)
 
 G1.add_node("p1", position="root")
 G1.add_node("a", position="right")
@@ -38,26 +52,35 @@ G1.add_node("i", position="left")
 G1.add_node("j", position="left")
 G1.add_node("k", position="left")
 
-# G.add_edge("p1", "a")
-# G.add_edge("p1", "p2")
-# G.add_edge("p2", "b")
-# G.add_edge("p2", "c")
+G.add_edge("p1", "c")
+G.add_edge("p1", "s1")
+G.add_edge("s1", "a")
+G.add_edge("s1", "b")
 
+G2.add_edge("p", "c")
+G2.add_edge("p", "s1")
+G2.add_edge("s1", "a")
+G2.add_edge("s1", "b")
+
+G3.add_edge("p1", "p2")
+G3.add_edge("p1", "b")
+G3.add_edge("p2", "a")
+G3.add_edge("p2", "c")
 
 # G.add_edge("p1", "a")
 # G.add_edge("p1", "b")
 # G.add_edge("p2", "c")
 
-G.add_edge("p1", "s1")
-G.add_edge("p1", "b")
-G.add_edge("s1", "a")
-G.add_edge("s1", "c")
-G.add_edge("c", "d")
-G.add_edge("c", "e")
-G.add_edge("b", "f")
-G.add_edge("b", "g")
-G.add_edge("e", "h")
-G.add_edge("e", "i")
+# G.add_edge("p1", "s1")
+# G.add_edge("p1", "b")
+# G.add_edge("s1", "a")
+# G.add_edge("s1", "c")
+# G.add_edge("c", "d")
+# G.add_edge("c", "e")
+# G.add_edge("b", "f")
+# G.add_edge("b", "g")
+# G.add_edge("e", "h")
+# G.add_edge("e", "i")
 
 G1.add_edge("p1", "a")
 G1.add_edge("p1", "s1")
@@ -112,7 +135,7 @@ G1.add_edge("c", "k")
 # a, b =  [n1 for n1, n2 in l if n1 == 'p1'][0], [n2 for n1, n2 in l if n2 == 'a'][0]
 # G.add_edge(a,b)
 # for i, j in l:
-#     G.remove_edge(i, j)
+# G.remove_edge(i, j)
 #
 # print G.edges()
 
@@ -171,8 +194,8 @@ def dfs_inorder(G, source=None):
 # dfs_inorder(G1)
 
 
-print G.successors('p1')[0]
-print G1.out_degree('a')
+# print G.successors('p1')[0]
+# print G1.out_degree('a')
 # print G.edges()
 #
 # for i, j in G.edges():
@@ -201,9 +224,22 @@ print G1.out_degree('a')
 # nx.write_dot(G,'test.dot')
 #
 # # same layout using matplotlib with no labels
+# print list(nx.dfs_edges(G1, 'p1'))
+bfs = list(nx.dfs_edges(G1, 'p1'))
+
+# n100 = [i for i, j in bfs]
+n100 = [j for i, j in bfs if G1.out_degree(j) == 0]
+
+output = []
+for i in n100:
+    if i not in output:
+       output.append(i)
+# print output
+
+# print G.predecessors()
 # plt.title("draw_networkx")
 # pos = nx.graphviz_layout(G, prog='dot')
-# nx.draw_graphviz(G2, prog='dot', with_labels=True, datas=True)
+# nx.draw_graphviz(G1, prog='dot', with_labels=True, datas=True)
 # nx.draw(G, pos, with_labels=True, arrows=False)
 # nx.draw_graphviz(G, prog='dot', with_labels=True, datas=True)
 
@@ -212,12 +248,35 @@ print G1.out_degree('a')
 # plt.savefig('BCT_operation_split.png')
 # plt.show()
 
-left, right = G.successors('p1')
-print left, right, G.successors('p1')
+# left, right = G.successors('p1')
+# print left, right, G.successors('p1')
 
+# print G.nodes()
 # print G.nodes()
 # print G.predecessors("a")
 # print nx.is_isomorphic(G, G1)
 # i = len([n for n in G.nodes() if n.__contains__('p')])
 # print i
 
+#
+import networkx.algorithms.isomorphism as iso
+#
+# position_category = iso.categorical_node_match(G.node['p1'], G2.node['p'])
+position_category = iso.categorical_node_match('position', ['left', 'right'])
+
+# # position_category = iso.categorical_edge_match('left', 'right')
+#
+#
+#
+
+# GM = iso.GraphMatcher(G,G3)
+# print GM.is_isomorphic()
+#
+#
+# print G3.nodes()
+# for i in [G, G2]:
+#     print i.nodes()
+#     print nx.is_isomorphic(i, G3, node_match=position_category)
+
+# print nx.is_isomorphic(G1, G2)
+print list(nx.bfs_edges(G, 'p1'))

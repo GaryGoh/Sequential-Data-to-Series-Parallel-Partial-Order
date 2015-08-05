@@ -2,6 +2,8 @@ __author__ = 'GaryGoh'
 
 import networkx as nx
 import matplotlib.pyplot as plt
+import networkx.algorithms.isomorphism as iso
+
 import copy
 import math
 
@@ -93,6 +95,117 @@ class BinaryConstructionTree(object):
         # if self.left == None and self.right == None:
         # return str(self.data)
 
+
+    def dfs_leaves(self, node=None):
+        """ Return a list of leaves based on deep-first search algorithm.
+
+        the order is from left to right
+
+
+        parameter
+        -------------
+        Node: String, a node of the binary decomposition tree, default is root.
+
+        return
+        -------
+        leaves: list, a list of leaves (events)
+
+        """
+
+        if not node:
+            node = self.get_nodes_from_position('root')[0]
+
+        bfs_all_nodes = list(nx.dfs_edges(self.tree, node))
+        leaves = [j for i, j in bfs_all_nodes if self.tree.out_degree(j) == 0]
+
+        # new a list to reduce the duplicate leaves.
+        leaves_output = []
+        for i in leaves:
+            if i not in leaves_output:
+                leaves_output.append(i)
+
+        return leaves_output
+
+    def dfs_operators(self, node=None):
+        """ Return a list of operators based on deep-first search algorithm.
+
+        the order is from left to right
+
+
+        parameter
+        -------------
+        Node: String, a node of the binary decomposition tree, default is root.
+
+        return
+        -------
+        operators: list, a list of operators
+
+        """
+
+        if not node:
+            node = self.get_nodes_from_position('root')[0]
+
+        bfs_all_nodes = list(nx.dfs_edges(self.tree, node))
+        operators = [i for i, j in bfs_all_nodes]
+        # operators = [i for i, j in bfs_all_nodes if self.tree.out_degree(j) == 0]
+
+
+        # new a list to reduce the duplicate operators.
+        operators_output = []
+        for i in operators:
+            if i not in operators_output:
+                operators_output.append(i)
+
+        return operators_output
+
+
+    def arithmetic_expression(self, node=None):
+        """ Return a list of events and operators of the arithmetic expression.
+
+        the order is from left to right
+
+
+        parameter
+        -------------
+        Node: String, a node of the binary decomposition tree, default is root.
+
+        return
+        -------
+        arithmetic_expression: list, a list of events and operators
+
+        """
+
+        if not node:
+            node = self.get_nodes_from_position('root')[0]
+
+        leaves = self.dfs_leaves()
+        arithmetic_expression = []
+
+        for i in leaves:
+
+            arithmetic_expression.append(i)
+
+            parent = self.tree.predecessors(i)[0]
+            if not parent in arithmetic_expression:
+                arithmetic_expression.append(parent)
+
+        return arithmetic_expression
+
+    def identity_isomorphic_order(self):
+        series_composition = [n for n in self.tree.nodes() if n.__contains__('series')]
+        parallel_composition = [n for n in self.tree.nodes() if n.__contains__('parallel')]
+
+        identity_series_order = self.series_partial_order_position_representation()
+        for p in parallel_composition:
+            for n in self.tree.successors(p):
+                if n in identity_series_order and self.tree.out_degree(n) == 0:
+                    identity_series_order.remove(n)
+            if p in identity_series_order:
+                identity_series_order.remove(p)
+        for s in series_composition:
+            if s in identity_series_order:
+                identity_series_order.remove(s)
+        return identity_series_order
 
     def BCT_operators(self):
         """ Return a new non-isomorphic binary construction tree.
@@ -199,12 +312,13 @@ class BinaryConstructionTree(object):
 
             return M
 
+        # To preserve meta structure.
+        M_self = copy.deepcopy(self)
 
         # To traverse all possible isomorphic binary tree
         for node in leaves_original:
 
-            # To preserve meta structure.
-            M = copy.deepcopy(self)
+            M = copy.deepcopy(M_self)
 
             # Do split operation
             split_node_parent, split_node = split(node)
@@ -213,6 +327,7 @@ class BinaryConstructionTree(object):
             leaves_insertion = leaves_original[:]
             leaves_insertion.remove(split_node)
 
+            # print leaves_insertion
             # Do insertion operation
             for insertnode in leaves_insertion:
 
@@ -224,22 +339,134 @@ class BinaryConstructionTree(object):
                         M_split = copy.deepcopy(M)
                         M_split = insertion(M_split, insertnode, split_node_parent, split_node, operator_entity,
                                             position)
-                        import networkx.algorithms.isomorphism as iso
 
-                        position_category = iso.categorical_edge_match('left', 'right')
+                        is_heteromorphism = 0
 
-                        if nx.is_isomorphic(self.tree, M_split.tree, edge_match=position_category):
-                            # print split_node, split_node_parent, insertnode, operator_entity, position
+                        identity_series_order = M_split.identity_isomorphic_order()
+
+                        for m in self.heteromorphism:
+                            m_identity_series_order = m.identity_isomorphic_order()
+                            # print "m_identity:{}".format(m_identity_series_order)
+                            # print "M_split:{}".format(identity_series_order)
+                            if identity_series_order != m_identity_series_order:
+                                is_heteromorphism += 1
+
+                        if is_heteromorphism == len(self.heteromorphism):
                             self.heteromorphism.append(M_split)
-
-
-        # M = copy.deepcopy(self)
-        # node = 'c'
-        # split_node_parent, split_node = split(node)
-        # M = insertion('b', split_node_parent, split_node, "parallel2", 'right')
-        # print M.tree.edges()
+                            # print M_split.series_partial_order_position_representation()
+                            # print M_split.tree.nodes(data = True)
+                            # print
 
         return
+
+    def series_partial_order_position_representation(self, root=None):
+
+        # try:
+        # Regard sp_order_list as a stack.
+        # sp_order_stack = list(nx.dfs_preorder_nodes(self.tree, node))
+        # sp_order_stack.reverse()
+        # print sp_order_stack
+        if not root:
+            root = self.get_nodes_from_position('root')[0]
+            self.reset_nodes_visit_default()
+
+        sp_order_stack = self.tree.successors(root)
+        sp_order_stack.reverse()
+
+        # print "current out stack:{}".format(sp_order_stack)
+
+        sp_order_list = []
+        # root = self.get_nodes_from_position('root')[0]
+        # sp_order_list.append(root)
+        # sp_order_stack.remove(root)
+
+        while sp_order_stack != []:
+
+            node = sp_order_stack.pop()
+            # print "current stack:{}".format(sp_order_stack)
+            # print "current node: {}".format(node)
+            # print
+
+            # if self.tree.node[node]['visit']:
+            #     continue
+            #
+            # if self.tree.node[node]['position'] == 'left':
+            #     if node.__contains__('parallel') or node.__contains__('series'):
+            #         nodes = self.series_partial_order_position_representation(node)
+            #         print "current nodes:{}".format(nodes)
+            #         for i in nodes:
+            #             sp_order_stack.append(i)
+            #             self.tree.node[i]['visit'] = True
+            #
+            #     else:
+            #         sp_order_list.append(node)
+            #         self.tree.node[node]['visit'] = True
+            #
+            # elif self.tree.node[node]['position'] == 'right':
+            #     parent = self.tree.predecessors(node)[0]
+            #     left_node = self.tree.successors(parent)
+            #     left_node.remove(node)
+            #     left_node = left_node[0]
+            #
+            #     if self.tree.node[left_node]['visit']:
+            #         sp_order_list.append(node)
+            #         sp_order_list.append(parent)
+            #     else:
+            #         sp_order_stack.insert(0, node)
+
+
+            if node.__contains__('parallel') or node.__contains__('series'):
+                nodes = self.series_partial_order_position_representation(node)
+                # print "currentnodes: {}".format(nodes)
+                # if nodes[-1].__contains__('parallel'):
+                #     nodes.remove(nodes[-1])
+                #     sp_order_list.append(nodes)
+                #     continue
+                # if nodes[-1].__contains__('series'):
+                #     nodes.remove(nodes[-1])
+                for i in nodes:
+                    sp_order_list.append(i)
+                self.tree.node[node]['visit'] = True
+
+            else:
+                if self.tree.node[node]['position'] == 'left':
+                    sp_order_list.append(node)
+                    self.tree.node[node]['visit'] = True
+
+                elif self.tree.node[node]['position'] == 'right':
+                    #
+                    parent = self.tree.predecessors(node)[0]
+                    left_node = self.tree.successors(parent)
+                    left_node.remove(node)
+                    left_node = left_node[0]
+
+                    if self.tree.node[left_node]['visit']:
+                        sp_order_list.append(node)
+                        # sp_order_list.append(parent)
+                        self.tree.node[node]['visit'] = True
+                        self.tree.node[parent]['visit'] = True
+
+                    else:
+                        # sp_order_list.append(left_node)
+                        # sp_order_stack.remove(left_node)
+                        #     sp_order_list.append(node)
+                        sp_order_stack.insert(0, node)
+
+                        # print node
+
+
+        # except Exception:
+        # raise Exception
+        # print "Current output:{}".format(sp_order_list)
+        # print
+        return sp_order_list
+
+    def reset_nodes_visit_default(self):
+
+        for node in self.tree.nodes():
+            self.tree.node[node]['visit'] = False
+        return
+
 
     def series_partial_order_representation(self, node=None):
         """ Return a path of the list of nodes.
@@ -255,7 +482,7 @@ class BinaryConstructionTree(object):
 
         """
         try:
-        # Regard sp_order_list as a stack.
+            # Regard sp_order_list as a stack.
             sp_order_stack = list(nx.dfs_preorder_nodes(self.tree, node))
             sp_order_stack.reverse()
 
@@ -270,12 +497,12 @@ class BinaryConstructionTree(object):
         #
         # while len(sp_order_stack) + len(temp_stack) >= 2:
         # # ecah round we check whether the root of the first element is match the third element.
-        #     # if len(sp_order_stack) >= 3:
-        #     #     the_first_element = sp_order_stack.pop()
-        #     # else:
-        #     #     the_first_element = temp_stack.pop()
-        #     # the_second_element = sp_order_stack.pop()
-        #     # the_third_element = sp_order_stack.pop()
+        # # if len(sp_order_stack) >= 3:
+        # #     the_first_element = sp_order_stack.pop()
+        # # else:
+        # #     the_first_element = temp_stack.pop()
+        # # the_second_element = sp_order_stack.pop()
+        # # the_third_element = sp_order_stack.pop()
         #
         #     current_elements = []
         #
@@ -428,7 +655,6 @@ class BinaryConstructionTree(object):
         return sp_order_stack
 
 
-
     def get_nodes_from_position(self, position=None):
 
         """ Return a list of nodes of the position.
@@ -456,11 +682,11 @@ class BinaryConstructionTree(object):
             raise Exception("in the part of plot_out() function")
 
 
-def inclusion_probability(M, M_i):
+def inclusion_probability(M, s):
     """ Return a float value of inclusion probability.
 
     pi_i = n / N,
-    where n = |sample i| = |M_i|
+    where n = |sequence| = |s|
           N = |population| = |M|
 
     Parameters
@@ -468,22 +694,40 @@ def inclusion_probability(M, M_i):
 
     M: Binary Construction Tree
 
-    M_i: Binary Construction Tree
+    s: String, A sequence without inclusion probability
 
 
     return
     -------
-    inclustion probability (pv_i): float
+    A dictionary of the sequence with (event: inclusion probability)
 
     """
 
-    n = M_i.tree.number_of_nodes()
-    N = M.tree.number_of_nodes()
+    # initialize a dictionary to store events with inclusion probabilites
+    s_with_inclusion_probabilites = {}
 
-    return float(n) / N
+    # calculating the events of intersection and difference.
+    V = [i for i in M.tree.nodes() if not (i.__contains__('parallel') or i.__contains__('series'))]
+    s_in_M = list(set(s).intersection(V))
+
+    # the size of two samples.
+    n = len(s_in_M)
+    N = len(V)
+
+    pv = float(n) / N
+
+    for i in s:
+        if i in s_in_M:
+            s_with_inclusion_probabilites[i] = pv
+        else:
+            # in fact that, the probabilities should be 0,
+            # however, for convenience, we define the probability as 1 - pv
+            s_with_inclusion_probabilites[i] = 1 - pv
+
+    return s_with_inclusion_probabilites
 
 
-def probability_of_generating_containing_events(M_i, s):
+def probability_of_generating_containing_events(M, s):
     """ Return a float value of inclusion probability.
 
     f(pv, s) = product_{v in s}(pv) * product_{v not in s}(1 - pv)
@@ -502,11 +746,17 @@ def probability_of_generating_containing_events(M_i, s):
 
     """
 
-    # v_in_s =
-    return
+    # initialize the probabilities of generating containing events.
+    f = 1
+
+    s_with_inclusion_probabilities = inclusion_probability(M, s)
+    for v, p in s_with_inclusion_probabilities.items():
+        f *= p
+
+    return f
 
 
-def compatable_with_SP(s, M):
+def compatable_with_SP(M, s):
     """ Return a int value of whether the sequence is compatible with the model M.
 
     Parameters
@@ -526,7 +776,40 @@ def compatable_with_SP(s, M):
 
     """
 
-    return
+    # To ensure partial order M has heteromorphic
+    # if not M.heteromorphism:
+    # M.BCT_operators()
+
+    # for m in M.heteromorphism:
+
+    m_leaves = M.dfs_leaves()
+    print m_leaves
+    print s[0], s[-1]
+
+    if s[0] in m_leaves:
+        m_leaves = m_leaves[m_leaves.index(s[0]):]
+    else:
+        return 0
+
+    # Traversal the incoming sequence, regarded it as a total order of a event set.
+    index = 0
+    for i in m_leaves:
+        print i
+        if i == s[index]:
+            continue
+        else:
+            parent = M.tree.predecessors(i)[0]
+
+            if parent.__contains__('parallel'):
+                children = M.tree.successors(parent)
+                if s[index] in children:
+                    # for child in children:
+                    # m_leaves.remove(child)
+                    continue
+                else:
+                    return 0
+        index += 1
+        return 1
 
 
 def number_of_extensions(M, root=None):
@@ -584,12 +867,12 @@ def number_of_extensions(M, root=None):
                 M.tree.node[operator]['num_extension'] = num_extension
     #
     # # When series structure
-    #     if operator.__contains__('series') or operator.__contains__('parallel'):
-    #         try:
-    #             # Employ the property of series-parallel partial order to calculate the number of extension
-    #             if operator.__contains__('series'):
-    #                 num_extension = (M.tree.node[left]['num_extension']) * (M.tree.node[right]['num_extension'])
-    #                 M.tree.node[operator]['num_extension'] = num_extension
+    # if operator.__contains__('series') or operator.__contains__('parallel'):
+    # try:
+    # # Employ the property of series-parallel partial order to calculate the number of extension
+    # if operator.__contains__('series'):
+    # num_extension = (M.tree.node[left]['num_extension']) * (M.tree.node[right]['num_extension'])
+    # M.tree.node[operator]['num_extension'] = num_extension
     #
     #             if operator.__contains__('parallel'):
     #                 # n1, n2 is the number of events (labels) on a partial order, we need to store the previous result.
@@ -640,17 +923,34 @@ Testing
 
 G = BinaryConstructionTree()
 G1 = BinaryConstructionTree()
+G2 = BinaryConstructionTree()
 
-G.tree.add_node("parallel", position="root", num_extension=0)
-G.tree.add_node("a", position="left", num_extension=0)
-G.tree.add_node("series", position="left", num_extension=0)
-G.tree.add_node("b", position="right", num_extension=0)
-G.tree.add_node("c", position="right", num_extension=0)
+G.tree.add_node("parallel", position="root", num_extension=0, visit=False)
+G.tree.add_node("a", position="right", num_extension=0, visit=False)
+G.tree.add_node("series", position="left", num_extension=0, visit=False)
+G.tree.add_node("b", position="right", num_extension=0, visit=False)
+G.tree.add_node("c", position="left", num_extension=0, visit=False)
 
 G.tree.add_edge("parallel", "series")
 G.tree.add_edge("parallel", "b")
 G.tree.add_edge("series", "a")
 G.tree.add_edge("series", "c")
+
+G2.tree.add_node("series", position="root", num_extension=0,visit=False)
+G2.tree.add_node("a", position="left", num_extension=0,visit=False)
+G2.tree.add_node("series1", position="left", num_extension=0,visit=False)
+G2.tree.add_node("b", position="left", num_extension=0,visit=False)
+G2.tree.add_node("series2", position="right", num_extension=0,visit=False)
+G2.tree.add_node("c", position="right", num_extension=0,visit=False)
+G2.tree.add_node("d", position="right", num_extension=0,visit=False)
+
+G2.tree.add_edge("series", "series1")
+G2.tree.add_edge("series", "d")
+G2.tree.add_edge("series1", "a")
+G2.tree.add_edge("series1", "series2")
+G2.tree.add_edge("series2", "b")
+G2.tree.add_edge("series2", "c")
+
 
 # G1.tree.add_edge("parallel", "series")
 # G1.tree.add_edge("parallel", "b")
@@ -703,21 +1003,21 @@ G.tree.add_edge("series", "c")
 # print G.info()
 
 
-G1.tree.add_node("parallel", position="root", num_extension=0)
-G1.tree.add_node("a", position="left", num_extension=0)
-G1.tree.add_node("series", position="right", num_extension=0)
-G1.tree.add_node("parallel1", position="left", num_extension=0)
-G1.tree.add_node("series2", position="right", num_extension=0)
-G1.tree.add_node("series1", position="left", num_extension=0)
-G1.tree.add_node("e", position="right", num_extension=0)
-G1.tree.add_node("parallel2", position="left", num_extension=0)
-G1.tree.add_node("g", position="right", num_extension=0)
-G1.tree.add_node("h", position="left", num_extension=0)
-G1.tree.add_node("i", position="right", num_extension=0)
-G1.tree.add_node("j", position="left", num_extension=0)
-G1.tree.add_node("parallel3", position="right", num_extension=0)
-G1.tree.add_node("l", position="left", num_extension=0)
-G1.tree.add_node("m", position="right", num_extension=0)
+G1.tree.add_node("parallel", position="root", num_extension=0, visit=False)
+G1.tree.add_node("a", position="left", num_extension=0,visit=False)
+G1.tree.add_node("series", position="right", num_extension=0,visit=False)
+G1.tree.add_node("parallel1", position="left", num_extension=0,visit=False)
+G1.tree.add_node("series2", position="right", num_extension=0,visit=False)
+G1.tree.add_node("series1", position="left", num_extension=0,visit=False)
+G1.tree.add_node("e", position="right", num_extension=0,visit=False)
+G1.tree.add_node("parallel2", position="left", num_extension=0,visit=False)
+G1.tree.add_node("g", position="right", num_extension=0,visit=False)
+G1.tree.add_node("h", position="left", num_extension=0,visit=False)
+G1.tree.add_node("i", position="right", num_extension=0,visit=False)
+G1.tree.add_node("j", position="left", num_extension=0,visit=False)
+G1.tree.add_node("parallel3", position="right", num_extension=0,visit=False)
+G1.tree.add_node("l", position="left", num_extension=0,visit=False)
+G1.tree.add_node("m", position="right", num_extension=0,visit=False)
 
 G1.tree.add_edge("parallel", "a")
 G1.tree.add_edge("parallel", "series")
@@ -767,6 +1067,56 @@ G1.tree.add_edge("parallel3", "m")
 # print list(nx.dfs_postorder_nodes(G1.tree, 'series'))
 # print
 # print G1.series_partial_order_representation('series')
-root = G1.get_nodes_from_position('root')[0]
-print number_of_extensions(G1, root)
+# root = G1.get_nodes_from_position('root')[0]
+# print number_of_extensions(G1, root)
+# s = ['a', 'b', 'c']
+s = ['c', 'a']
+
+
+# s = ['b', 'a', 'c', 'd']
+
+# print G.tree.nodes()
+# print inclusion_probability(G,s)
+# print probability_of_generating_containing_events(G, s)
+# G1.BCT_operators()
+# print G1.series_partial_order_representation()
+
+# print G1.tree.edges()
+
+# print G1.series_partial_order_position_representation()
+
+
+G.BCT_operators()
+print len(G.heteromorphism)
+
+# print G2.dfs_leaves('series2')
+# print G.identity_isomorphic_order()
+
+# print G2.series_partial_order_position_representation()
+# print G.identity_isomorphic_order()
+# print G2.series_partial_order_position_representation()
+# print G.identity_isomorphic_order()
+
+# print G2.series_partial_order_position_representation()
+# print G.identity_isomorphic_order()
+# print G.plot_out()
+
+# print compatable_with_SP(G, s)
+
+for g in G.heteromorphism:
+#     print g.tree.nodes(data=True)
+    print g.series_partial_order_position_representation()
+#     print g.tree.edges()
+#     print
+
+# print
+# print len(g.heteromorphism)
+
+# print g.series_partial_order_position_representation()
+
+# print
+
+
+# print g.tree.nodes()
+
 # G1.plot_out()
