@@ -191,11 +191,11 @@ class BinaryConstructionTree(object):
 
         return arithmetic_expression
 
-    def identity_isomorphic_order(self):
+    def identity_isomorphic_order(self, root = None):
         series_composition = [n for n in self.tree.nodes() if n.__contains__('series')]
         parallel_composition = [n for n in self.tree.nodes() if n.__contains__('parallel')]
 
-        identity_series_order = self.series_partial_order_position_representation()
+        identity_series_order = self.series_partial_order_position_representation(root)
         for p in parallel_composition:
             for n in self.tree.successors(p):
                 if n in identity_series_order and self.tree.out_degree(n) == 0:
@@ -443,6 +443,79 @@ class BinaryConstructionTree(object):
                     if self.tree.node[left_node]['visit']:
                         sp_order_list.append(node)
                         # sp_order_list.append(parent)
+                        self.tree.node[node]['visit'] = True
+                        self.tree.node[parent]['visit'] = True
+
+                    else:
+                        # sp_order_list.append(left_node)
+                        # sp_order_stack.remove(left_node)
+                        #     sp_order_list.append(node)
+                        sp_order_stack.insert(0, node)
+
+                        # print node
+
+
+        # except Exception:
+        # raise Exception
+        # print "Current output:{}".format(sp_order_list)
+        # print
+        return sp_order_list
+
+
+    def series_partial_order_composition_representation(self, root=None):
+
+        # try:
+        # Regard sp_order_list as a stack.
+        # sp_order_stack = list(nx.dfs_preorder_nodes(self.tree, node))
+        # sp_order_stack.reverse()
+        # print sp_order_stack
+        if not root:
+            root = self.get_nodes_from_position('root')[0]
+            self.reset_nodes_visit_default()
+
+        sp_order_stack = self.tree.successors(root)
+        sp_order_stack.reverse()
+
+        # print "current out stack:{}".format(sp_order_stack)
+
+        sp_order_list = []
+        # root = self.get_nodes_from_position('root')[0]
+        # sp_order_list.append(root)
+        # sp_order_stack.remove(root)
+
+        while sp_order_stack != []:
+
+            node = sp_order_stack.pop()
+
+            if node.__contains__('parallel') or node.__contains__('series'):
+                nodes = self.series_partial_order_position_representation(node)
+                # print "currentnodes: {}".format(nodes)
+                if nodes[-1].__contains__('parallel'):
+                    nodes.remove(nodes[-1])
+                    sp_order_list.append(nodes)
+                    continue
+                elif nodes[-1].__contains__('series'):
+                    nodes.remove(nodes[-1])
+                for i in nodes:
+                    sp_order_list.append(i)
+                self.tree.node[node]['visit'] = True
+
+            else:
+                if self.tree.node[node]['position'] == 'left':
+                    sp_order_list.append(node)
+                    self.tree.node[node]['visit'] = True
+
+                elif self.tree.node[node]['position'] == 'right':
+                    #
+                    parent = self.tree.predecessors(node)[0]
+                    left_node = self.tree.successors(parent)
+                    left_node.remove(node)
+                    left_node = left_node[0]
+
+                    print parent
+                    if self.tree.node[left_node]['visit']:
+                        sp_order_list.append(node)
+                        sp_order_list.append(parent)
                         self.tree.node[node]['visit'] = True
                         self.tree.node[parent]['visit'] = True
 
@@ -782,35 +855,82 @@ def compatable_with_SP(M, s):
 
     # for m in M.heteromorphism:
 
-    m_leaves = M.dfs_leaves()
-    print m_leaves
-    print s[0], s[-1]
+    # m_leaves = M.dfs_leaves()
+    # print m_leaves
+    # print s[0], s[-1]
+    #
+    # if s[0] in m_leaves:
+    #     m_leaves = m_leaves[m_leaves.index(s[0]):]
+    # else:
+    #     return 0
+    #
+    # # Traversal the incoming sequence, regarded it as a total order of a event set.
+    # index = 0
+    # for i in m_leaves:
+    #     print i
+    #     if i == s[index]:
+    #         continue
+    #     else:
+    #         parent = M.tree.predecessors(i)[0]
+    #
+    #         if parent.__contains__('parallel'):
+    #             children = M.tree.successors(parent)
+    #             if s[index] in children:
+    #                 # for child in children:
+    #                 # m_leaves.remove(child)
+    #                 continue
+    #             else:
+    #                 return 0
+    #     index += 1
+    #     return 1
 
-    if s[0] in m_leaves:
-        m_leaves = m_leaves[m_leaves.index(s[0]):]
-    else:
-        return 0
 
-    # Traversal the incoming sequence, regarded it as a total order of a event set.
-    index = 0
-    for i in m_leaves:
-        print i
-        if i == s[index]:
-            continue
-        else:
-            parent = M.tree.predecessors(i)[0]
+    # String to list
+    sequence_list = []
+    for i in s:
+        sequence_list.append(i)
 
-            if parent.__contains__('parallel'):
-                children = M.tree.successors(parent)
-                if s[index] in children:
-                    # for child in children:
-                    # m_leaves.remove(child)
+    sequence_list.reverse()
+
+
+    # Gready searching
+    while sequence_list:
+
+        # Getting the current event and its relevant parameters
+        s0 = sequence_list.pop()
+        s1 = sequence_list.pop()
+        parent = M.tree.predecessors(s0)[0]
+        left_node = M.tree.successors(parent)
+        left_node.remove(s0)
+        left_node = left_node[0]
+
+        if parent.__contains__('parallel'):
+            if left_node.__contains__('parallel') or left_node.__contains__('series'):
+                nodes = M.series_partial_order_position_representation(left_node)
+            else:
+                nodes = [left_node]
+
+            if s1 in nodes:
+                continue
+            else:
+                return 0
+
+
+
+        if parent.__contains__('series'):
+            if left_node.__contains__('parallel') or left_node.__contains__('series'):
+                node = M.series_partial_order_position_representation(left_node)[0]
+                if s1 == node:
                     continue
                 else:
                     return 0
-        index += 1
-        return 1
+            else:
+                if len(M.tree.node[s0]['position']) < len(M.tree.node[s1]['position']):
+                    continue
+                else:
+                    return 0
 
+    return 1
 
 def number_of_extensions(M, root=None):
     """ Return a int value of the number of completed extension of the SP-order.
@@ -940,16 +1060,16 @@ G2.tree.add_node("series", position="root", num_extension=0,visit=False)
 G2.tree.add_node("a", position="left", num_extension=0,visit=False)
 G2.tree.add_node("series1", position="left", num_extension=0,visit=False)
 G2.tree.add_node("b", position="left", num_extension=0,visit=False)
-G2.tree.add_node("series2", position="right", num_extension=0,visit=False)
+G2.tree.add_node("parallel1", position="right", num_extension=0,visit=False)
 G2.tree.add_node("c", position="right", num_extension=0,visit=False)
 G2.tree.add_node("d", position="right", num_extension=0,visit=False)
 
 G2.tree.add_edge("series", "series1")
 G2.tree.add_edge("series", "d")
 G2.tree.add_edge("series1", "a")
-G2.tree.add_edge("series1", "series2")
-G2.tree.add_edge("series2", "b")
-G2.tree.add_edge("series2", "c")
+G2.tree.add_edge("series1", "parallel1")
+G2.tree.add_edge("parallel1", "b")
+G2.tree.add_edge("parallel1", "c")
 
 
 # G1.tree.add_edge("parallel", "series")
@@ -1070,7 +1190,7 @@ G1.tree.add_edge("parallel3", "m")
 # root = G1.get_nodes_from_position('root')[0]
 # print number_of_extensions(G1, root)
 # s = ['a', 'b', 'c']
-s = ['c', 'a']
+# s = ['c', 'a']
 
 
 # s = ['b', 'a', 'c', 'd']
@@ -1086,26 +1206,30 @@ s = ['c', 'a']
 # print G1.series_partial_order_position_representation()
 
 
-G.BCT_operators()
-print len(G.heteromorphism)
+# G.BCT_operators()
+# print len(G.heteromorphism)
 
 # print G2.dfs_leaves('series2')
 # print G.identity_isomorphic_order()
 
-# print G2.series_partial_order_position_representation()
+
+# print G.series_partial_order_composition_representation()
+# print G1.series_partial_order_composition_representation()
+# print G2.series_partial_order_position_representation('parallel1')
 # print G.identity_isomorphic_order()
 # print G2.series_partial_order_position_representation()
-# print G.identity_isomorphic_order()
+# print G2.identity_isomorphic_order()
 
 # print G2.series_partial_order_position_representation()
 # print G.identity_isomorphic_order()
 # print G.plot_out()
 
-# print compatable_with_SP(G, s)
+print G2.series_partial_order_position_representation()
+print compatable_with_SP(G2, s)
 
-for g in G.heteromorphism:
+# for g in G.heteromorphism:
 #     print g.tree.nodes(data=True)
-    print g.series_partial_order_position_representation()
+#     print g.series_partial_order_position_representation()
 #     print g.tree.edges()
 #     print
 

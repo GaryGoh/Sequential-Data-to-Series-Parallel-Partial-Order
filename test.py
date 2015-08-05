@@ -33,7 +33,7 @@ d = [[i, j, k] for i, j, k in c if k == 3]
 f = 12
 
 i, j, k = c[0]
-a2 = "abc'"
+a2 = "abc"
 
 # i = a.index(a[0])
 # j = a.index(a[-1])
@@ -41,8 +41,20 @@ a2 = "abc'"
 
 
 
-a.append([11,12])
-print a
+# a.append([11,12])
+
+
+# print 11 in a
+# print next(a)
+a2.split()
+aa2 = []
+for a in a2:
+    aa2.append(a)
+
+print aa2
+# print a2[0]
+aa = aa2.pop()
+print aa
 # print i, j,k
 #
 # if d:
@@ -60,10 +72,10 @@ e = [1]
 
 # a.append(f)
 # a.append(f)
-if a:
-    print "yew"
-else:
-    print 'no'
+# if a:
+#     print "yew"
+# else:
+#     print 'no'
 
 # if len(e) > 0 and e.pop():
 #     print "yes"
